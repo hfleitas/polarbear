@@ -4,8 +4,8 @@ Sentinel to ADX migration.
 ## Standard Tables
 ```mermaid
 graph LR
-   sourcetable-->|namespace| hubtable
-   hubtable-->_import
+   sourcetable--> |namespace| hubtable
+   hubtable--> |adx| _import
    _import-->|fn_table| table
 ```
 
