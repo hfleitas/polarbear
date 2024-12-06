@@ -5,7 +5,7 @@
 ```mermaid
 graph LR
    sourcetable--> |namespace| hubtable
-   hubtable--> |adx| _import
+   hubtable--> |kusto| _import
    _import-->|fn_table| table
 ```
 
