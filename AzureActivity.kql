@@ -1,0 +1,210 @@
+https://portal.azure.com/?feature.msaljs=true#@gov.nu.ca/resource/subscriptions/6b77f969-0012-468b-8499-3cbf163d96fc/resourceGroups/monitoring/providers/microsoft.operationalinsights/workspaces/govnucaproduction/logs
+ 
+cluster('https://ade.loganalytics.io/subscriptions/6b77f969-0012-468b-8499-3cbf163d96fc/resourcegroups/Monitoring/providers/microsoft.operationalinsights/workspaces/govnucaproduction').database('govnucaproduction').AzureActivity
+| where TimeGenerated >= ago(24h)
+| take 10
+| getschema //2nd - 39 cols
+ 
+AzureActivity_Old
+| mv-expand records
+| evaluate bag_unpack(records)
+| where TimeGenerated >= ago(24h)
+// | take 10
+// | where * has 'OperationId' 
+| getschema // 28, _underscroll ones like isbillable, billedsize and timereceived make sense to not show.
+
+
+cluster('https://ade.loganalytics.io/subscriptions/6b77f969-0012-468b-8499-3cbf163d96fc/resourcegroups/Monitoring/providers/microsoft.operationalinsights/workspaces/govnucaproduction').database('govnucaproduction').AADManagedIdentitySignInLogs
+| where TimeGenerated >= ago(24h)
+| take 10
+| getschema //38 cols
+
+AADManagedIdentitySignInLogs_Old
+| mv-expand records
+| evaluate bag_unpack(records)
+| where TimeGenerated >= ago(24h)
+| take 10
+| getschema //26 cols
+
+.append async AADManagedIdentitySignInLogs_Old <| 
+cluster('https://ade.loganalytics.io/subscriptions/6b77f969-0012-468b-8499-3cbf163d96fc/resourcegroups/Monitoring/providers/microsoft.operationalinsights/workspaces/govnucaproduction').database('govnucaproduction').AADManagedIdentitySignInLogs
+| where TimeGenerated between ( .. )
+
+
+
+.create-or-alter function fn_AzureActivity(){
+AzureActivity_Old
+| mv-expand records
+| evaluate bag_unpack(records)
+}
+
+
+.set AzureActivity <| fn_AzureActivity | take 0
+
+
+fn_AzureActivity
+| getschema 
+
+
+//update policy to transform records as they land in import table to pretty table structured.
+.alter table AzureActivity policy update
+```
+[
+    {
+        "IsEnabled": true,
+        "Source": "AzureActivity_Import",
+        "Query": "fn_AzureActivity"
+    }
+]
+```
+
+AzureActivity
+| take 10
+
+.append AzureActivity_Old <| AzureActivity_Old | take 10
+
+.show ingestion failures 
+
+
+AzureActivity_Old 
+| mv-expand records
+| evaluate bag_unpack(records)
+| take 10
+| getschema 
+
+fn_AzureActivity
+| getschema 
+
+
+AzureActivity_Import
+| count //12750
+
+AzureActivity_Old 
+| count //11578
+
+.show table AzureActivity_Import policy ingestionbatching 
+
+.show database Test policy ingestionbatching 
+
+.show cluster policy ingestionbatching  //not authorized.
+
+// default is 5min, would recommend lowering the batching policy for the import table or enabling streaming for the cluster and then on the import table.
+
+AzureActivity
+| count
+
+.show ingestion failures 
+
+
+let AzureActivity_Import = table("AzureActivity_Import", 'All', 'AllButRowStore') 
+| where extent_id() in (guid(3fbfe187-bba4-462a-9646-53f938ef7141));
+fn_AzureActivity
+| getschema 
+
+.drop table AzureActivity ifexists 
+
+.set AzureActivity <| fn_AzureActivity | limit 0
+
+AzureActivity
+| getschema
+
+
+.create-or-alter function fn_AzureActivity(){
+AzureActivity_Import
+| mv-expand records
+| evaluate bag_unpack(records) 
+}
+
+
+.alter table AzureActivity policy update
+```
+[
+    {
+        "IsEnabled": true,
+        "Source": "AzureActivity_Import",
+        "Query": "fn_AzureActivity"
+    }
+]
+```
+
+AzureActivity_Import
+| count
+
+
+AzureActivity
+| count
+
+.show ingestion failures 
+
+
+.append AzureActivity <|
+AzureActivity_Import
+| where ingestion_time() >=ago(10m)
+| take 10
+| mv-expand records
+| evaluate bag_unpack(records)
+// | project Caller
+| extend Caller=toguid(tostring(Caller))
+// | getschema 
+
+//Query schema does not match table schema. 8 & 13 (guid vs dynamic),
+//QuerySchema=('string,guid,string,string,string,string,dynamic,guid,string,string,string,dynamic,guid,guid,datetime,string,string,string,string,string,dynamic,string,string,string,guid,guid,datetime,string'), 
+//TableSchema=('string,guid,string,string,string,string,dynamic,dynamic,string,string,string,dynamic,dynamic,guid,datetime,string,string,string,string,string,dynamic,string,string,string,guid,guid,datetime,string')
+
+QuerySchema=('string,guid,string,string,string,string,dynamic,guid,string,string,string,dynamic,guid,guid,datetime,string,string,string,string,string,dynamic,string,string,string,guid,guid,datetime,string'),
+TableSchema=('string,guid,string,string,string,string,dynamic,dynamic,string,string,string,dynamic,dynamic,guid,datetime,string,string,string,string,string,dynamic,string,string,string,guid,guid,datetime,string')
+
+fn_AzureActivity
+| take 100
+// | project CorrelationId //Caller
+| getschema 
+
+
+// .create-or-alter function fn_AzureActivity(){
+AzureActivity_Import
+| take 10
+| mv-expand records
+| evaluate bag_unpack(records) 
+| extend Caller=toguid(tostring(Caller))
+| getschema 
+// }
+
+
+.create-or-alter function fn_AzureActivity(){
+AzureActivity_Import
+| mv-expand records
+| evaluate bag_unpack(records) 
+| extend Caller=toguid(tostring(Caller))
+}
+
+
+.drop table AzureActivity ifexists 
+
+.set AzureActivity <| fn_AzureActivity | limit 0
+
+AzureActivity
+| getschema 
+
+//tested .append successfully.
+
+.clear table AzureActivity data 
+
+
+// turned on update policy.
+
+
+AzureActivity
+| count 
+
+AzureActivity_Import
+| count
+
+
+.alter table AzureActivity_Import policy ingestionbatching
+```
+{
+    "MaximumBatchingTimeSpan" : "00:00:10",
+    "MaximumNumberOfItems" : 500,
+    "MaximumRawDataSizeMB": 1024
+}
+```
