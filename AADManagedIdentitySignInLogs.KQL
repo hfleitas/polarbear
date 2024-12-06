@@ -1,0 +1,111 @@
+cluster('https://ade.loganalytics.io/subscriptions/6b77f969-0012-468b-8499-3cbf163d96fc/resourcegroups/Monitoring/providers/microsoft.operationalinsights/workspaces/govnucaproduction').database('govnucaproduction').AADManagedIdentitySignInLogs
+| take 10
+| getschema
+
+AADManagedIdentitySignInLogs_Import
+| getschema
+
+//create the function fn_AADManagedIdentitySignInLogs to expand the records
+.create-or-alter function fn_AADManagedIdentitySignInLogs(){
+AADManagedIdentitySignInLogs_Import
+| mv-expand records
+| evaluate bag_unpack(records) 
+//| extend CorrelationId=toguid(tostring(CorrelationId))
+}
+
+AADManagedIdentitySignInLogs_Import
+| mv-expand records
+| evaluate bag_unpack(records) 
+| getschema 
+
+fn_AADManagedIdentitySignInLogs
+| take 100
+| getschema 
+
+//set the ingestionbatching policy for AADManagedIdentitySignInLogs_Import
+.alter table AADManagedIdentitySignInLogs_Import policy ingestionbatching
+```
+{
+    "MaximumBatchingTimeSpan" : "00:00:10",
+    "MaximumNumberOfItems" : 500,
+    "MaximumRawDataSizeMB": 1024
+}
+```
+
+//verify the ingestionbatching policy for AADManagedIdentitySignInLogs_Import
+.show table AADManagedIdentitySignInLogs_Import policy ingestionbatching 
+
+//create AADManagedIdentitySignInLogs table with the schema from fn_AADManagedIdentitySignInLogs with no data.
+.set AADManagedIdentitySignInLogs <| fn_AADManagedIdentitySignInLogs | take 0
+
+//update policy to transform records as they land in import table to pretty table structured.
+.alter table AADManagedIdentitySignInLogs policy update
+```
+[
+    {
+        "IsEnabled": true,
+        "Source": "AADManagedIdentitySignInLogs_Import",
+        "Query": "fn_AADManagedIdentitySignInLogs"
+    }
+]
+```
+
+AADManagedIdentitySignInLogs_Import
+| count 
+
+AADManagedIdentitySignInLogs
+| count 
+
+//testing 
+.append AADManagedIdentitySignInLogs_Import <| AADManagedIdentitySignInLogs_Import | take 10
+
+//testing 
+.clear table AADManagedIdentitySignInLogs_Import data 
+
+//testing
+//.drop table AADManagedIdentitySignInLogs ifexists 
+
+AADManagedIdentitySignInLogs_Import
+| count 
+
+AADManagedIdentitySignInLogs
+| count
+
+AADManagedIdentitySignInLogs_Import
+| take 10 
+
+AADManagedIdentitySignInLogs
+| take 10 
+
+AADManagedIdentitySignInLogs_Import
+| getschema 
+
+AADManagedIdentitySignInLogs
+| getschema 
+
+.show ingestion failures | where FailedOn >= ago(2hr) | order by FailedOn desc 
+
+.show table AADManagedIdentitySignInLogs_Import ingestion mappings 
+
+AADManagedIdentitySignInLogs_ImportTest_mapping
+
+AADManagedIdentitySignInLogs_Import 
+| summarize count() by bin(ingestion_time(),1h)
+
+.delete table AADManagedIdentitySignInLogs_Import records <| 
+AADManagedIdentitySignInLogs_Import 
+| where   bin(ingestion_time(),1h) in (datatable (['$IngestionTime']: datetime) [
+    datetime(2024-12-06T11:00:00Z),
+    datetime(2024-12-06T12:00:00Z),
+    datetime(2024-12-06T16:00:00Z)
+]) 
+
+AADManagedIdentitySignInLogs
+| summarize count() by bin(ingestion_time(),15m)
+
+.delete table AADManagedIdentitySignInLogs records  <| 
+AADManagedIdentitySignInLogs 
+| where   bin(ingestion_time(),15m) in (datatable (['$IngestionTime']: datetime) [
+    datetime(2024-12-06T16:30:00Z),
+    datetime(2024-12-06T18:00:00Z)
+]) 
