@@ -1,5 +1,5 @@
-# 🐻‍❄️
-Sentinel to ADX migration.
+# 🐻‍❄️ Sentinel to ADX/Fabric Migration
+
 
 ## Standard Tables
 ```mermaid
