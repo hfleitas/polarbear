@@ -1,4 +1,4 @@
-# Nuna
+# 🐻‍❄️
 Sentinel to ADX migration.
 
 ## Standard Tables
