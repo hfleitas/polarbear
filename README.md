@@ -1,7 +1,9 @@
 # 🐻‍❄️ Sentinel to ADX/Fabric Migration
 
+1. Standard Tables
+2. Custom Tables
 
-## Standard Tables
+## 1. Standard Tables
 ```mermaid
 graph LR
    sourcetable--> |namespace| hubtable
@@ -26,11 +28,11 @@ If the kql function fails to processes batches, the failures can be seen using s
 - [Integrate Azure Data Explorer (ADX) for long-term log retention](https://github.com/Azure/Azure-Sentinel/tree/master/Tools/AzureDataExplorer)
 
 
-## Custom Tables
+## 2. Custom Tables
 
-- Cisco_Umbrella_dns_CL: Current flow Python AzFunction to LAW.
-- ZPA_CL: Current flow using Syslog AMA Collector to LAW.
-
-## Reference
-- [Zscaler-Microsoft-Sentinel-Deployment-Guide-FINAL.pdf](https://help.zscaler.com/downloads/zscaler-technology-partners/operations/zscaler-and-microsoft-sentinel-deployment-guide/Zscaler-Microsoft-Sentinel-Deployment-Guide-FINAL.pdf)
-- [Enable Logging to a Cisco-managed S3 Bucket](https://docs.umbrella.com/deployment-umbrella/docs/cisco-managed-s3-bucket)
+- Cisco_Umbrella_dns_CL
+   - Current flow Python AzFunction to LAW.
+   - [Enable Logging to a Cisco-managed S3 Bucket](https://docs.umbrella.com/deployment-umbrella/docs/cisco-managed-s3-bucket)
+- ZPA_CL
+   - Current flow using Syslog AMA Collector to LAW.
+   - [Zscaler-Microsoft-Sentinel-Deployment-Guide-FINAL.pdf](https://help.zscaler.com/downloads/zscaler-technology-partners/operations/zscaler-and-microsoft-sentinel-deployment-guide/Zscaler-Microsoft-Sentinel-Deployment-Guide-FINAL.pdf)
