@@ -1,4 +1,4 @@
-https://portal.azure.com/?feature.msaljs=true#@gov.nu.ca/resource/subscriptions/6b77f969-0012-468b-8499-3cbf163d96fc/resourceGroups/monitoring/providers/microsoft.operationalinsights/workspaces/govnucaproduction/logs
+// https://portal.azure.com/?feature.msaljs=true#@gov.nu.ca/resource/subscriptions/6b77f969-0012-468b-8499-3cbf163d96fc/resourceGroups/monitoring/providers/microsoft.operationalinsights/workspaces/govnucaproduction/logs
  
 cluster('https://ade.loganalytics.io/subscriptions/6b77f969-0012-468b-8499-3cbf163d96fc/resourcegroups/Monitoring/providers/microsoft.operationalinsights/workspaces/govnucaproduction').database('govnucaproduction').AzureActivity
 | where TimeGenerated >= ago(24h)
