@@ -1,0 +1,50 @@
+cluster('https://ade.loganalytics.io/subscriptions/6b77f969-0012-468b-8499-3cbf163d96fc/resourcegroups/Monitoring/providers/microsoft.operationalinsights/workspaces/govnucaproduction').database('govnucaproduction').Syslog
+| count
+
+//create the function fn_Syslog to expand the records
+.create-or-alter function fn_Syslog(){
+Syslog_Import
+| mv-expand records
+| evaluate bag_unpack(records) 
+}
+
+fn_Syslog
+| take 100
+| getschema 
+
+//set the ingestionbatching policy for Syslog_Import
+.alter table Syslog_Import policy ingestionbatching
+```
+{
+    "MaximumBatchingTimeSpan" : "00:00:10",
+    "MaximumNumberOfItems" : 500,
+    "MaximumRawDataSizeMB": 1024
+}
+```
+
+//verify the ingestionbatching policy for Syslog_Import
+.show table Syslog_Import policy ingestionbatching 
+
+//create AADManagedIdentitySignInLogs table with the schema from fn_Syslog with no data.
+.set Syslog <| fn_Syslog | take 0
+
+//update policy to transform records as they land in import table to pretty table structured.
+.alter table Syslog policy update
+```
+[
+    {
+        "IsEnabled": true,
+        "Source": "Syslog_Import",
+        "Query": "fn_Syslog"
+    }
+]
+```
+
+Syslog_Import
+| count 
+
+Syslog
+| count 
+
+
+
