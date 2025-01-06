@@ -35,5 +35,5 @@ If the kql function fails to processes batches, the failures can be seen using s
    - Current flow Python AzFunction to LAW. Recommendation is to replace this using standard connector by Sentinel team.
    - [Enable Logging to a Cisco-managed S3 Bucket](https://docs.umbrella.com/deployment-umbrella/docs/cisco-managed-s3-bucket)
 - ZPA_CL
-   - Current flow using Syslog AMA Collector to LAW.
+   - Current flow using Syslog AMA Collector to LAW. Recommendation is to use logstash for dual-ingest.
    - [Zscaler-Microsoft-Sentinel-Deployment-Guide-FINAL.pdf](https://help.zscaler.com/downloads/zscaler-technology-partners/operations/zscaler-and-microsoft-sentinel-deployment-guide/Zscaler-Microsoft-Sentinel-Deployment-Guide-FINAL.pdf)
