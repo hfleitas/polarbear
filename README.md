@@ -22,6 +22,7 @@ If the kql function fails to processes batches, the failures can be seen using s
 
 1. [AzureActivity.kql](AzureActivity.kql)
 2. [AADManagedIdentitySignInLogs.kql](AADManagedIdentitySignInLogs.kql)
+3. [Syslog.kql](Syslog.kql)
 
 
 ## Reference
@@ -31,7 +32,7 @@ If the kql function fails to processes batches, the failures can be seen using s
 ## 2. Custom Tables
 
 - Cisco_Umbrella_dns_CL
-   - Current flow Python AzFunction to LAW.
+   - Current flow Python AzFunction to LAW. Recommendation is to replace this using standard connector by Sentinel team.
    - [Enable Logging to a Cisco-managed S3 Bucket](https://docs.umbrella.com/deployment-umbrella/docs/cisco-managed-s3-bucket)
 - ZPA_CL
    - Current flow using Syslog AMA Collector to LAW.
