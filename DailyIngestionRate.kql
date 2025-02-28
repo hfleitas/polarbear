@@ -1,0 +1,11 @@
+Usage
+| where TimeGenerated >= ago(7d)
+| summarize count() by bin(TimeGenerated,1m), Quantity
+| extend MBperS = Quantity/60
+| summarize avg(MBperS), min(MBperS), max(MBperS)
+
+
+Usage
+| where TimeGenerated >= ago(30d)
+| summarize sum(Quantity) by bin(TimeGenerated,1d)
+| summarize avgMB=avg(sum_Quantity)
