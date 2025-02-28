@@ -20,9 +20,9 @@ Any redacted columns from the source table in log analytics workspace are contro
 
 If the kql function fails to processes batches, the failures can be seen using system view `.show ingestion failures`. For which case, the function can be altered as needed, but the data would still be writen in "raw" format to the `_import` table incase it needs to be read.
 
-1. [AzureActivity.kql](AzureActivity.kql)
-2. [AADManagedIdentitySignInLogs.kql](AADManagedIdentitySignInLogs.kql)
-3. [Syslog.kql](Syslog.kql)
+1. [AzureActivity.kql](adx/AzureActivity.kql)
+2. [AADManagedIdentitySignInLogs.kql](adx/AADManagedIdentitySignInLogs.kql)
+3. [Syslog.kql](adx/Syslog.kql)
 
 
 ## Reference
